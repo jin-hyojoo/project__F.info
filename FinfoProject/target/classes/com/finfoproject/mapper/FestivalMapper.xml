@@ -1,0 +1,162 @@
+<?xml version="1.0" encoding="UTf-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.finfoproject.mapper.FestivalMapper">
+
+	<!-- 페스티벌 작성 -->
+	<insert id="write" parameterType="com.finfoproject.domain.FestivalVO">
+		insert into FESTIVAL values (
+		festival_seq.nextval,
+		#{f_SUBJECT}, #{f_START}, #{f_END}, #{f_PLACE}, #{f_TAG1}, #{f_TAG2},
+		#{g_NO}, #{f_THUMBNAIL}, #{f_DESC}, #{f_IMGURL}, #{f_URL},
+		#{f_SHOWLOWERPRICE}, #{f_STATE})
+	</insert>
+
+	<!-- 페스티벌 조회 -->
+	<select id="read" parameterType="int" resultType="com.finfoproject.domain.FestivalVO">
+		select f.f_no, f.f_subject, f.f_start, f.f_end,
+			f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+			f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+		from festival f inner join genre g on f.g_no = g.g_no
+		where f_NO= #{f_NO}
+	</select>
+
+	<!-- 페스티벌 수정 -->
+	<update id="update" parameterType="com.finfoproject.domain.FestivalVO">
+		update FESTIVAL
+		set
+		f_SUBJECT = #{f_SUBJECT},
+		f_START = #{f_START},
+		f_END = #{f_END},
+		f_PLACE = #{f_PLACE},
+		f_TAG1 = #{f_TAG1},
+		f_TAG2 = #{f_TAG2},
+		g_NO = #{g_NO},
+		f_THUMBNAIL = #{f_THUMBNAIL},
+		f_DESC = #{f_DESC},
+		f_IMGURL = #{f_IMGURL},
+		f_URL = #{f_URL},
+		f_SHOWLOWERPRICE = #{f_SHOWLOWERPRICE},
+		f_STATE = #{f_STATE}
+		where f_NO = #{f_NO}
+	</update>
+
+	<!-- 페스티벌 삭제 -->
+	<delete id="delete" parameterType="int">
+		delete from
+		FESTIVAL
+		where f_NO = #{f_NO}
+	</delete>
+	
+	<!-- 페스티벌 선호도 목록 -->
+	<select id="list" resultType="com.finfoproject.domain.FestivalVO">
+		<![CDATA[ 
+			select f.f_no, f.f_subject, f.f_start, f.f_end,
+				f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+				f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+			from festival f inner join genre g on f.g_no = g.g_no 
+				inner join users u on u.u_like1 = g.g_name
+			where u_like1 = #{u_like1,jdbcType=VARCHAR} and ROWNUM>=1 and ROWNUM<= 4
+		]]>
+	</select>
+	
+	<!-- 페스티벌 선호도2 목록 -->
+	<select id="list2" resultType="com.finfoproject.domain.FestivalVO">
+		<![CDATA[ 
+			select f.f_no, f.f_subject, f.f_start, f.f_end,
+				f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+				f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+			from festival f inner join genre g on f.g_no = g.g_no 
+				inner join users u on u.u_like1 = g.g_name
+			where u_like2 = #{u_like2,jdbcType=VARCHAR} and ROWNUM>=1 and ROWNUM<= 4
+		]]>
+	</select>
+	
+	<!-- 페스티벌 장르별 목록 -->
+	<select id="listGenre" resultType="com.finfoproject.domain.FestivalVO">
+		<![CDATA[ 
+			select f.f_no, f.f_subject, f.f_start, f.f_end,
+				f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+				f.f_desc, f.f_imgurl, f.f_url,f.f_showlowprice, f.f_state
+			from festival f inner join genre g on f.g_no = g.g_no 
+			where g.g_no = 1 and ROWNUM>=1 and ROWNUM<= 4
+		]]>
+	</select>
+	
+		<!-- 페스티벌 장르별 목록 -->
+	<select id="listGenre2" resultType="com.finfoproject.domain.FestivalVO">
+		<![CDATA[ 
+			select f.f_no, f.f_subject, f.f_start, f.f_end,
+				f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+				f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+			from festival f inner join genre g on f.g_no = g.g_no 
+			where f_state = 2 and ROWNUM>=1 and ROWNUM<= 4
+		]]>
+	</select>
+	
+	<!-- 페스티벌 장르별 목록 -->
+	<select id="listGenre3" resultType="com.finfoproject.domain.FestivalVO">
+		<![CDATA[ 
+			select f.f_no, f.f_subject, f.f_start, f.f_end,
+				f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+				f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+			from festival f inner join genre g on f.g_no = g.g_no 
+			where ROWNUM>=1 and ROWNUM<= 4
+			order by f_end
+		]]>
+	</select>
+	
+	<!-- 목록 + 페이징 -->
+	<select id="listPage" resultType="com.finfoproject.domain.FestivalVO" parameterType="com.finfoproject.domain.Criteria">
+		select f.f_no, f.f_subject, f.f_start, f.f_end,
+			f.f_place, f.f_tag1, f.f_tag2, f.g_no, g.g_name , f.f_thumbnail,
+			f.f_desc, f.f_imgurl, f.f_url, f.f_showlowprice, f.f_state
+		from festival f inner join genre g on f.g_no = g.g_no
+		where F_NO between ${rowStart} and ${rowEnd}
+		order by F_NO desc
+	</select>
+	
+	<select id = "listCount" resultType="int">
+		<![CDATA[
+			select count(F_NO)
+			from FESTIVAL
+			where F_NO > 0
+		]]>
+	</select>
+	
+	<!-- 리뷰 등록 -->
+	<insert id="registReview" parameterType="com.finfoproject.domain.ReviewVO">
+		insert into REVIEW values (
+		 review_seq.nextval,#{f_NO}, #{u_EMAIL}, #{r_CONTENT})
+	</insert>
+	
+	<!-- 리뷰 목록 -->
+	<select id="reviewList" parameterType="int" resultType="com.finfoproject.domain.ReviewVO">
+		select r_NO, u_EMAIL, r_CONTENT, r_REGDATE from REVIEW
+		where f_NO = #{f_NO}
+	</select>
+	
+	<!-- 리뷰 삭제 -->
+	<delete id="deleteReview">
+		delete REVIEW 
+		where r_NO = #{r_NO}
+			and u_EMAIL = #{u_EMAIL}
+	</delete>
+	
+	<!-- 리뷰 ID 본인 확인 -->
+	<select id="reviewIdCheck" resultType="String">
+		select u_EMAIL
+		from REVIEW
+			where r_NO = #{r_NO}
+	</select>
+	
+	<!-- 리뷰 수정 -->
+	<update id="modifyReview">
+		update REVIEW 
+		set 
+			r_CONTENT = #{r_CONTENT}
+			where r_NO = #{r_NO}
+				and u_EMAIL = #{u_EMAIL}
+	</update>
+</mapper>

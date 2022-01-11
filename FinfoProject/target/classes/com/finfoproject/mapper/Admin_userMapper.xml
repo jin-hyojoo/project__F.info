@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.finfoproject.mapper.Admin_userMapper">
+  
+  	<sql id="criteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item='type' collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'N'.toString()">
+							U_NAME like '%'||#{keyword}||'%'
+						</when>
+						<when test="type == 'E'.toString()">
+							U_EMAIL like '%'||#{keyword}||'%'
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+  
+  
+	<update id="update">
+		update USERS set u_ck = #{u_ck}
+						 where u_no = #{u_no}
+	</update>
+  
+  	<select id="getListWithPaging" resultType="com.finfoproject.domain.UsersVO">
+		  <![CDATA[
+		  select 
+		    u_no, u_pw, u_email, u_name, u_like1, u_like2, u_ck
+		  from 
+		      (
+		      select 
+		        rownum rn, u_no, u_pw, u_email, u_name, u_like1, u_like2, u_ck
+		      from 
+		        USERS
+		      where 
+		  ]]>
+			<include refid ="criteria"></include>
+			
+		  <![CDATA[    
+			      rownum <= #{pageNum} * #{amount}
+			      )
+			  where rn > (#{pageNum} -1) * #{amount}   
+		  ]]>
+	</select>
+  
+  	<select id="getTotalCount" resultType = "int">
+		select count(*) from USERS
+		where 
+		<include refid ="criteria"></include>
+		u_no >0
+	</select>
+  
+  </mapper>

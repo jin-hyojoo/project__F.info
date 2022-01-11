@@ -1,0 +1,28 @@
+잘되던 FINFO 프로젝트 코드폴더가 갑자기 오류남 404뜸.. 
+디버깅을 해보니 오라클 연결쪽의 문제 (ORA-28001 , ORA-28002)
+검색해보니 오라클 비밀번호 만료기간 해제가 필요한다고 한다.
+
+cmd창
+sqlplus "/as sysdba"
+connect sys as sysdba
+
+ select * from dba_profiles
+ where profile='DEFAULT';
+로 비번 유효기간 확인 (세팅하지 않은 경우엔 보통 180일 기준)
+
+비번 유효기간을 unlimited로 변경 (계속 사용 가능하게)
+alter profile default limit pasword_life_time unlimited;
+
+사용할 사용자 계정 언락해줌 (변경가능하게 락 해제시킴)
+alter user festival account unlock;
+
+비밀번호 변경
+alter user festival identified by festival1;
+
+이제 스프링으로 돌아가서 확인해야할 것들
+1) root-config.xml
+2) DB 디벨로퍼에 가서 만들어놨던 DB의 환경설정 -> 위에서 변경한 비밀번호 변경 후 
+   연결 잘 되는지 ping 확인 후 DB실행 시켜 줌.
+3) 프로젝트 서버 재실행
+
+

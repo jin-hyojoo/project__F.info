@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE mapper
+  PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+  "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+  <mapper namespace="com.finfoproject.mapper.Admin_festivalMapper">
+ 
+  <sql id="criteria">
+		<trim prefix="(" suffix=") AND " prefixOverrides="OR">
+			<foreach item='type' collection="typeArr">
+				<trim prefix="OR">
+					<choose>
+						<when test="type == 'S'.toString()">
+							f_SUBJECT like '%'||#{keyword}||'%'
+						</when>
+						<when test="type == 'N'.toString()">
+							g_name like '%'||#{keyword}||'%'
+						</when>
+					</choose>
+				</trim>
+			</foreach>
+		</trim>
+	</sql>
+	
+  
+  	<select id="getListWithPaging" resultType="com.finfoproject.domain.FestivalVO">
+		  <![CDATA[
+		  select 
+		    f_NO, f_SUBJECT, f_START, f_END, f_STATE, g_NO
+		  from 
+		      (
+		      select 
+			 rownum rn, f_NO, f_SUBJECT, f_START, f_END, f_STATE, g_NO
+		      from 
+		        FESTIVAL
+		      where 
+		  ]]>
+			<include refid ="criteria"></include>
+		  <![CDATA[    
+			      rownum <= #{pageNum} * #{amount}
+			      )
+			  where rn > (#{pageNum} -1) * #{amount}   
+		  ]]>
+	</select>
+	
+  
+  	<select id="getTotalCount" resultType = "int">
+		select count(*) from FESTIVAL
+		where 
+		<include refid ="criteria"></include>
+		f_no >0
+	</select>
+	
+	<update id="update">
+		update FESTIVAL set f_STATE = #{f_STATE}
+						 where f_NO = #{f_NO}
+	</update>
+	
+	<insert id="write1"> 
+		insert into FESTIVAL (f_NO, f_SUBJECT, f_START, f_END, f_PLACE, f_TAG1, f_TAG2,
+							  g_NO, f_THUMBNAIL, f_DESC, f_IMGURL, f_URL, f_SHOWLOWPRICE, f_STATE)
+		values (
+		festival_seq.nextval, #{f_SUBJECT}, #{f_START, jdbcType=VARCHAR}, #{f_END, jdbcType=VARCHAR}, #{f_PLACE}, #{f_TAG1}, #{f_TAG2},
+		#{g_NO}, #{f_THUMBNAIL, jdbcType=VARCHAR}, #{f_DESC}, #{f_IMGURL, jdbcType=VARCHAR}, #{f_URL}, #{f_SHOWLOWPRICE, jdbcType=VARCHAR}, #{f_STATE})
+	</insert>
+	
+	<insert id="write"> 
+		insert into FESTIVAL (f_NO, f_SUBJECT, f_PLACE, f_TAG1, f_TAG2, g_NO,
+							  f_DESC, f_URL, f_SHOWLOWPRICE, f_STATE)
+		values (festival_seq.nextval, #{f_SUBJECT}, #{f_PLACE}, #{f_TAG1}, #{f_TAG2}, #{g_NO},
+				 #{f_DESC}, #{f_URL}, #{f_SHOWLOWPRICE, jdbcType=VARCHAR}, #{f_STATE})
+	</insert>
+	
+	<select id="read" resultType="com.finfoproject.domain.FestivalVO">
+		select * from FESTIVAL where f_NO = #{f_NO}
+	</select>
+
+
+	<update id="modify">
+		update FESTIVAL set f_SUBJECT = #{f_SUBJECT},
+							f_PLACE = #{f_PLACE},
+							f_TAG1 = #{f_TAG1},
+							f_TAG2 = #{f_TAG2},
+							g_NO = #{g_NO},
+							f_DESC = #{f_DESC},
+							f_URL = #{f_URL},
+							f_SHOWLOWPRICE = #{f_SHOWLOWPRICE},
+							f_STATE = #{f_STATE}
+		where f_NO = #{f_NO}
+	</update>
+
+	<delete id="delete">
+		delete  FESTIVAL where f_NO = #{f_NO}
+	</delete>
+  
+  </mapper>
