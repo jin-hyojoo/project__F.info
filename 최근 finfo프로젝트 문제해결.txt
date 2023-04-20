@@ -16,8 +16,8 @@ alter profile default limit pasword_life_time unlimited;
 사용할 사용자 계정 언락해줌 (변경가능하게 락 해제시킴)
 alter user festival account unlock;
 
-비밀번호 변경
-alter user festival identified by festival1;
+ALTER USER 문을 사용하며 기존 비밀번호 새로운 비밀번호로 초기화 (비밀번호 변경)
+alter user festival identified by newPassword;
 
 이제 스프링으로 돌아가서 확인해야할 것들
 1) root-config.xml
